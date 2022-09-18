@@ -4,16 +4,12 @@ import {drawHorizontal, drawVerticle } from './actions';
 import { WoolColors } from './colors/wool/woolColors';
 import parseImage from './parseImage';
 
-
-let path = "./images/";
-let filename = "";
-if(process.argv[2]){
-    filename = process.argv[2];
+let pixelArray : WoolColors[][] = [];
+if(process.argv[3].trim().toLocaleLowerCase() === "false") {
+    pixelArray= parseImage(process.argv[2], false);
 } else {
-    throw new Error("Couldn't find specified file in " + path)
+    pixelArray = parseImage(process.argv[2], true);
 }
-
-let pixelArray : WoolColors[][] = parseImage(process.argv[2], false);
 
 const subscribeToPlayerMessages = {
     "header":{
@@ -129,7 +125,7 @@ wss.on('connection', (socket) => {
             message[2] = Number(message[2]);
             message[3] = Number(message[3]);
             message[4] = Number(message[4]);
-            //command example !draw h x y z true(skip whitespace)
+
             if(message[0] === "!draw"){
                 
                 if(message[1] === "h"){
