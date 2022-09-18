@@ -1,9 +1,10 @@
 import ws from 'ws';
-import getPixels from 'get-pixels';
 
-import { WoolColors, drawHorizontal, findClosestWoolColor, findGreyscaleWoolColor, drawVerticle } from './actions';
+import {drawHorizontal, drawVerticle } from './actions';
+import { WoolColors } from './colors/wool/woolColors';
+import parseImage from './parseImage';
 
-let pixelArray : WoolColors[][] = [];
+
 let path = "./images/";
 let filename = "";
 if(process.argv[2]){
@@ -11,26 +12,8 @@ if(process.argv[2]){
 } else {
     throw new Error("Couldn't find specified file in " + path)
 }
-getPixels(path + filename, (err : any , pixels : any) => {
-    if(err){
-        console.log(err);
-        return;
-    }
 
-    for(let y = 0; y < pixels.shape[1]; y++){
-        let row = [];
-        for(let x = 0; x < pixels.shape[0]; x++){
-            const r = pixels.get(x, y, 0);
-            const g = pixels.get(x, y, 1);
-            const b = pixels.get(x, y, 2);
-            // const a = pixels.get(x, y, 3);
-            // const rgba = [r, g, b];
-            row.push(findGreyscaleWoolColor(r, g, b));
-        }
-        pixelArray.push(row);
-    }
-})
-
+let pixelArray : WoolColors[][] = parseImage(process.argv[2], false);
 
 const subscribeToPlayerMessages = {
     "header":{
@@ -44,7 +27,6 @@ const subscribeToPlayerMessages = {
 
     }
 }
-
 
 // Says given string in chat. 
 function response ( msg: string ) {
@@ -119,35 +101,46 @@ const wss = new ws.Server({
     port: 7000
 });
 
+
+type DrawCommand = [
+    string,
+    string, 
+    number,
+    number,
+    number,
+    string, 
+    boolean?
+];
+
+
 wss.on('connection', (socket) => {
     console.log('Connected');
-    // Subsribe to chat events. 
+
     socket.send(JSON.stringify(subscribeToPlayerMessages));
 
     socket.send(response("A wild bot has appeared"));
-
-    socket.on("drawH", () => {
-        drawHorizontal(socket, pixelArray, true);
-    })
-
-    socket.on("drawV", () => {
-        drawVerticle(socket, pixelArray, true);
-    })
 
     socket.on('message', packet => {
        
         let msg = JSON.parse(packet.toString('utf-8'));
 
         if(msg.body.type === 'chat'){  
-            let message = msg.body.message.toLowerCase().trim();
+            const message : DrawCommand = msg.body.message.toLowerCase().trim().split(" ");
+            message[2] = Number(message[2]);
+            message[3] = Number(message[3]);
+            message[4] = Number(message[4]);
+            //command example !draw h x y z true(skip whitespace)
+            if(message[0] === "!draw"){
+                
+                if(message[1] === "h"){
+                    drawHorizontal(socket, pixelArray, message[2], message[3], message[4], message[5] ? true : false);
+                }
 
-            switch(message){
-                case "h!draw":
-                    socket.emit("drawH");
-                    break;
-                case "v!draw":
-                    socket.emit("drawV");
-                    break;
+                else if(message[1] === "v"){
+                    drawVerticle(socket, pixelArray, message[2], message[3], message[4], message[5] ? true : false);
+                }
+
+                else return; // There was an error with the command, do something about it. 
             }
         } 
     })
