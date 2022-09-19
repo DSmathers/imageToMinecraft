@@ -42,57 +42,6 @@ function response ( msg: string ) {
     })
 };
 
-// Unused but kept for reference. 
-
-const interaction = {
-    "header" : {
-        "version" : 1,
-        "requestId" : "1234321",
-        "messageType" : "commandRequest",
-        "messagePurpose" : "subscribe"
-    },
-    "body" : {
-        "eventName" : "MobInteracted"
-    }
-}
-function sendPrivatemessage( user : string, message : string ) {
-    return JSON.stringify({
-        "header" : {
-            "version" : 1,
-            "requestId" : "234234",
-            "messageType" : "commandRequest",
-            "messagePurpose" : "commandRequest"
-        },
-        "body" : {
-            "commandLine" : `tell ${user} ${message}`,
-            "origin" : {
-                "type" : "player",
-                "name" : "Testy"
-            }
-        }
-    })
-}
-
-function giveItemToPlayer ( user : string, item : string ) {
-    return JSON.stringify({
-        "header" : {
-            "version" : 1,
-            "requestId" : "234234",
-            "messageType" : "commandRequest",
-            "messagePurpose" : "commandRequest"
-        },
-        "body" : {
-            "commandLine" : `give ${user} ${item} 1 `,
-            "origin" : {
-                "type" : "player",
-                "name" : "Testy"
-            }
-        }
-    })
-}
-// End reference functions. 
-
-
 const wss = new ws.Server({
     port: 7000
 });
@@ -107,7 +56,6 @@ type DrawCommand = [
     string, 
     boolean?
 ];
-
 
 wss.on('connection', (socket) => {
     console.log('Connected');

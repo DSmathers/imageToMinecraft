@@ -26,7 +26,7 @@ export default function parseImage ( filename : string, color : boolean = true )
         }
     })
 
-    timer(30);
+    timer(30); // hack to wait for getPixel callback..
 
     return pixelArray;
 }
