@@ -58,7 +58,7 @@ export async function drawHorizontal (socket:any, pixelArray : WoolColors[][], x
                                     y, 
                                     z + i, 
                                     pixelArray[i][j]));
-                    await timer(100);
+                    await timer(20);
             }
         }
     }    
@@ -80,7 +80,7 @@ export async function drawVerticle (socket:any, pixelArray : WoolColors[][], x :
                                     y - i, 
                                     z, 
                                     pixelArray[i][j]));
-                    await timer(100);
+                    await timer(20);
             }
         }
     }    
