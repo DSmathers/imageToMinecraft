@@ -1,6 +1,6 @@
 import ws from 'ws';
 
-import {drawHorizontal, drawVerticle } from './actions';
+import {buildWalls, drawHorizontal, drawVerticle } from './actions';
 import { WoolColors } from './colors/wool/woolColors';
 import parseImage from './parseImage';
 
@@ -47,15 +47,28 @@ const wss = new ws.Server({
 });
 
 
-type DrawCommand = [
-    string,
-    string, 
-    number,
-    number,
-    number,
-    string, 
-    boolean?
-];
+function messageToDrawCommand ( socket: any, message : string[] )  {
+    let x = Number(message[2]);
+    let y = Number(message[3]);
+    let z = Number(message[4]);
+    let ignoreWhitespace = message[5] === "true" ? true : false; 
+    if(message[1] === "h") {
+        drawHorizontal(socket, pixelArray, x, y, z, ignoreWhitespace);
+    }
+
+    else if ( message[1] === "v") {
+        drawVerticle(socket, pixelArray, x, y, z, ignoreWhitespace);
+    }
+}
+
+function messageToBuildCommand ( socket : any, message : string[] ) {
+    let x = Number(message[1]);
+    let y = Number(message[2]);
+    let z = Number(message[3]);
+    let height = Number(message[4]);
+    let blockName = message[5];
+    buildWalls(socket, pixelArray, x, y, z, height, blockName); 
+}
 
 wss.on('connection', (socket) => {
     console.log('Connected');
@@ -69,22 +82,14 @@ wss.on('connection', (socket) => {
         let msg = JSON.parse(packet.toString('utf-8'));
 
         if(msg.body.type === 'chat'){  
-            const message : DrawCommand = msg.body.message.toLowerCase().trim().split(" ");
-            message[2] = Number(message[2]);
-            message[3] = Number(message[3]);
-            message[4] = Number(message[4]);
-
+            const message = msg.body.message.toLowerCase().trim().split(" ");
+ 
             if(message[0] === "!draw"){
-                
-                if(message[1] === "h"){
-                    drawHorizontal(socket, pixelArray, message[2], message[3], message[4], message[5] ? true : false);
-                }
+                messageToDrawCommand(socket, message);
+            }
 
-                else if(message[1] === "v"){
-                    drawVerticle(socket, pixelArray, message[2], message[3], message[4], message[5] ? true : false);
-                }
-
-                else return; // There was an error with the command, do something about it. 
+            else if ( message[0] === "!build"){
+                messageToBuildCommand(socket, message);
             }
         } 
     })

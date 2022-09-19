@@ -47,7 +47,6 @@ export function setWool( x : number, y : number, z : number, color : WoolColors 
 
 
 export async function drawHorizontal (socket:any, pixelArray : WoolColors[][], x: number, y: number, z:number,  skipWhitespace : boolean = false) {
-    console.log('drawing');
     for(let i = 0; i<pixelArray.length; i++){
         for(let j = 0; j<pixelArray[i].length; j++){
             let skip = skipWhitespace;
@@ -82,6 +81,24 @@ export async function drawVerticle (socket:any, pixelArray : WoolColors[][], x :
                                     z, 
                                     pixelArray[i][j]));
                     await timer(100);
+            }
+        }
+    }    
+}
+
+export async function buildWalls (socket:any, pixelArray : WoolColors[][], x: number, y: number, z:number, height: number, blockName: string, color? : number ) {
+    for(let i = 0; i<pixelArray.length; i++){
+        for(let j = 0; j<pixelArray[i].length; j++){
+            if (pixelArray[i][j] == WoolColors.white) {
+                continue;
+            }   else {
+                    socket.send(setPillar(
+                                    x + j, 
+                                    y, 
+                                    z + i, 
+                                    height,
+                                    blockName));
+                    await timer(20);
             }
         }
     }    
