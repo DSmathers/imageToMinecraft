@@ -142,7 +142,8 @@ const Colors = [White, Orange, Magenta, LightBlue, Yellow, Lime, Pink, Gray, Lig
 
 export function findGreyscaleWoolColor(r: number, b: number, g: number ) : WoolColors {
   
-    let grayValue = (r + b + g) / 3;
+    //let grayValue = (r + b + g) / 3;
+    let grayValue = (r * .299) + (g * .587) + (b * .114);
 
     if(grayValue <= 70){
         return WoolColors.black;
