@@ -43,7 +43,8 @@ function response ( msg: string ) {
 };
 
 const wss = new ws.Server({
-    port: 7000
+    port: 8080,
+    host: '0.0.0.0'
 });
 
 
