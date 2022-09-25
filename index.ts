@@ -4,7 +4,7 @@ import {buildWalls, drawHorizontal, drawVerticle } from './actions';
 import { WoolColors } from './colors/wool/woolColors';
 import parseImage from './parseImage';
 
-
+const timer = (ms:number) => new Promise(res => setTimeout(res, ms));
 
 let colorArray : WoolColors[][] = [];
 let greyscaleArray : WoolColors[][] = []; 
@@ -16,13 +16,18 @@ function isImageLoaded () : boolean {
     return true;
 }
 
-function loadImage (socket : any, imageName : string ) : void {
+async function loadImage (socket : any, imageName : string ) : Promise<void> {
 
     colorArray = parseImage(imageName + ".png", true);
     greyscaleArray = parseImage(imageName + ".png", false);
+
+    await timer(30);
     if(colorArray.length < 1) {
         socket.send(response("Message failed to load"));
         return;
+    }
+    else {
+        socket.send(response("Image loaded and ready to draw!"));
     }
 }
 
