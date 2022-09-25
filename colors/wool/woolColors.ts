@@ -142,7 +142,6 @@ const Colors = [White, Orange, Magenta, LightBlue, Yellow, Lime, Pink, Gray, Lig
 
 export function findGreyscaleWoolColor(r: number, b: number, g: number ) : WoolColors {
   
-    //let grayValue = (r + b + g) / 3;
     let grayValue = (r * .299) + (g * .587) + (b * .114);
 
     if(grayValue <= 70){
@@ -164,7 +163,7 @@ export function findClosestWoolColor(r : number , g : number , b : number ) : Wo
     }
     Colors.map((color) => {
         let distance = Math.pow(color.r - r, 2) + Math.pow(color.g - g, 2) + Math.pow(color.b -b, 2);
-        //console.log(distance);
+
         if(distance < closest.distance) {
             closest.distance = distance;
             closest.color = color.colorId
