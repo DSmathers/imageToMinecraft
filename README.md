@@ -1,10 +1,18 @@
 # Initial Setup
     
-### With git and Docker.
-  - Clone this repository
-  - ``` cd imageToMinecraft ```
-  - Put any images you want available into the /images folder. Note that only .png images are currently supported.
-  - ``` docker-compose up --build```
+   Clone this repository <br />
+   ``` cd imageToMinecraft ``` <br />
+   Put any images you want available into the /images folder. Note that only .png images are currently supported. <br />
+   Run ``` docker-compose up --build``` <br />
+   - If you don't have Docker, you can run <br /> ``` npm install --production && node ./dist/v1.1.0 ``` 
+   
+   <b>In Minecraft</b> run the command : ``` /connect localhost:8080 ``` <br />
+   
+   ## <b>Use in-game commands to load and draw your image into your Minecraft World! </b> <br /><br />
+   
+   ### This is only tested on Bedrock edition, and is only available on some devices. 
+
+   <br /><br />
 
 ### From zip.
     //todo
