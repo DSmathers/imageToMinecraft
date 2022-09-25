@@ -1,15 +1,23 @@
 import getPixels from "get-pixels";
 import { findClosestWoolColor, findGreyscaleWoolColor, WoolColors } from "./colors/wool/woolColors";
 
-export default function parseImage ( filename : string, color : boolean = true ) : WoolColors[][]{
+export default function parseImage ( filename : string, color : boolean = true ) : WoolColors[][] {
     const timer = (ms:number) => new Promise(res => setTimeout(res, ms));
     const path = "./images/";
 
     let pixelArray : WoolColors[][] = [];
     getPixels(path + filename, (err : any , pixels : any) => {
         if(err){
-            console.log(err);
-            return;
+            return new Error(err.message);
+        }
+        let height;
+        let width;
+
+        try {
+            height = pixels.shape[1];
+            width = pixels.shape[0];
+        } catch (e) {
+            return new Error(' There was a problem parsing the image. ');
         }
     
         for(let y = 0; y < pixels.shape[1]; y++){
