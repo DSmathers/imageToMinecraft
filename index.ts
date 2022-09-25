@@ -4,11 +4,27 @@ import {buildWalls, drawHorizontal, drawVerticle } from './actions';
 import { WoolColors } from './colors/wool/woolColors';
 import parseImage from './parseImage';
 
-let pixelArray : WoolColors[][] = [];
 
-const colorArray : WoolColors[][] = parseImage(process.argv[2], true);
-const greyscaleArray : WoolColors[][] = parseImage(process.argv[2], false);
 
+let colorArray : WoolColors[][] = [];
+let greyscaleArray : WoolColors[][] = []; 
+
+function isImageLoaded () : boolean {
+    if(colorArray.length < 1) {
+        return false;
+    }
+    return true;
+}
+
+function loadImage (socket : any, imageName : string ) : void {
+
+    colorArray = parseImage(imageName + ".png", true);
+    greyscaleArray = parseImage(imageName + ".png", false);
+    if(colorArray.length < 1) {
+        socket.send(response("Message failed to load"));
+        return;
+    }
+}
 
 const subscribeToPlayerMessages = {
     "header":{
@@ -74,7 +90,7 @@ function messageToBuildCommand ( socket : any, message : string[] ) {
     let z = Number(message[3]);
     let height = Number(message[4]);
     let blockName = message[5];
-    buildWalls(socket, pixelArray, x, y, z, height, blockName); 
+    buildWalls(socket, colorArray, x, y, z, height, blockName); 
 }
 
 wss.on('connection', (socket) => {
@@ -92,11 +108,22 @@ wss.on('connection', (socket) => {
             const message = msg.body.message.toLowerCase().trim().split(" ");
  
             if(message[0] === "!draw"){
-                messageToDrawCommand(socket, message);
+                if(isImageLoaded() === true) {
+                    messageToDrawCommand(socket, message);
+                } else socket.send(response("No image loaded."));
+                
             }
 
             else if ( message[0] === "!build"){
-                messageToBuildCommand(socket, message);
+                if(isImageLoaded() === true) {
+                    messageToBuildCommand(socket, message);
+                } else socket.send(response("No image loaded."));
+                
+            }
+
+            else if ( message[0] === "!load"){
+                //
+                loadImage(socket, message[1]);
             }
         } 
     })
