@@ -13,14 +13,15 @@
 - [1] - x : where to place the top left corner of the image
 - [2] - y : where to place the top left corner of the image
 - [3] - z : where to place the top left corner of the image
-- [4] - true | false : true to ignore whitespace
+- [4] - true | false : true for color, false for greyscale
+- [5] - true | false : true to ignore whitespace.
 
 
 #### Example
 
-``` !draw h 100 0 100 true ```
+``` !draw h 100 0 100 true true ```
 
-Draws the loaded image horizontally starting at (100, 0, 100) using color image. 
+Draws the loaded image horizontally starting at (100, 0, 100) using color image and ignoring whitespace.
 
 #### Note : 
     For verticle images, the top left corner of the given images will be at the coordinates given. The image then draws in a positive direction along the x axis and negative along the y axis. Left to right, top to bottom. 
