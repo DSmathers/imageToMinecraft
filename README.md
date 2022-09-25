@@ -1,9 +1,28 @@
 # Initial Setup
- 
- TODO...
+    
+### With git and Docker.
+  - Clone this repository
+  - ``` cd imageToMinecraft ```
+  - Put any images you want available into the /images folder. Note that only .png images are currently supported.
+  - ``` docker-compose up --build```
+
+### From zip.
+    //todo
 
 
 # In-Game Commands
+
+## "!load"
+
+    Currently only .png images are supported. 
+
+#### Args
+- [0] image-name : Only the name of the image, no extension.
+
+#### Example
+``` !load colorWheel ```
+
+---
 
 ## "!draw"
 
