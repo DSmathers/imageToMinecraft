@@ -1,11 +1,19 @@
 import getPixels from "get-pixels";
-import { findClosestWoolColor, findGreyscaleWoolColor, WoolColors } from "./colors/wool/woolColors";
+import { Block } from "./blocks/IBlock";
+import { ColorIds, findClosestColor, matchToBaseColor, matchToGreyscale } from "./colors/Colors";
+import matchClosestBlock from "./utils/matchClosestBlock";
 
-export default function parseImage ( filename : string, color : boolean = true ) : WoolColors[][] {
+export type PixelColor = {
+    r : number,
+    g : number,
+    b : number
+}
+
+export default function parseImage ( filename : string, color : boolean = true, palette : string ) : Block[][] {
     const timer = (ms:number) => new Promise(res => setTimeout(res, ms));
     const path = "./images/";
 
-    let pixelArray : WoolColors[][] = [];
+    let pixelArray : Block[][] = [];
     getPixels(path + filename, (err : any , pixels : any) => {
         if(err){
             return new Error(err.message);
@@ -28,7 +36,9 @@ export default function parseImage ( filename : string, color : boolean = true )
                 const b = pixels.get(x, y, 2);
                 // const a = pixels.get(x, y, 3);
                 // const rgba = [r, g, b];
-                color ? row.push(findClosestWoolColor(r, g, b)) : row.push(findGreyscaleWoolColor(r, g, b)); 
+                //color ? row.push(findClosestColor(r, g, b)) : row.push(matchToGreyscale(r, g, b)); 
+                row.push(matchClosestBlock({r, g, b}, palette));
+                //row.push({r, g, b});
             }
             pixelArray.push(row);
         }
@@ -38,3 +48,4 @@ export default function parseImage ( filename : string, color : boolean = true )
 
     return pixelArray;
 }
+

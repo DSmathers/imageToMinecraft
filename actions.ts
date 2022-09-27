@@ -1,4 +1,6 @@
-import { WoolColors } from "./colors/wool/woolColors";
+import { Block } from "./blocks/IBlock";
+import { ColorIds } from "./colors/Colors";
+
 
 // This is used to set a timeout between commands so Minecraft can keep up. 
 const timer = (ms:number) => new Promise(res => setTimeout(res, ms));
@@ -39,32 +41,26 @@ function setPillar (x: number, y: number, z:number, height:number, blockName: st
 }
 
 
-
-export function setWool( x : number, y : number, z : number, color : WoolColors = WoolColors.white) {
-    return setBlock(x, y, z, 'wool', color);
-}
-
-
-
-export async function drawHorizontal (socket:any, pixelArray : WoolColors[][], x: number, y: number, z:number,  skipWhitespace : boolean = false) {
-    for(let i = 0; i<pixelArray.length; i++){
-        for(let j = 0; j<pixelArray[i].length; j++){
+export async function drawHorizontal (socket:any, blockArray : Block[][], x: number, y: number, z:number,  skipWhitespace : boolean = false) {
+    for(let i = 0; i<blockArray.length; i++){
+        for(let j = 0; j<blockArray[i].length; j++){
             let skip = skipWhitespace;
-            if ( skip && pixelArray[i][j] == WoolColors.white) {
+            if ( skip && blockArray[i][j].colorId == ColorIds.white) {
                 continue;
             }   else {
-                    socket.send(setWool(
+                    socket.send(setBlock(
                                     x + j, 
                                     y, 
                                     z + i, 
-                                    pixelArray[i][j]));
+                                    blockArray[i][j].name,
+                                    blockArray[i][j].colorId));
                     await timer(20);
             }
         }
     }    
 }
 
-export async function drawVerticle (socket:any, pixelArray : WoolColors[][], x : number, y : number, z : number, skipWhitespace : boolean = false) {
+export async function drawVerticle (socket:any, pixelArray : Block[][], x : number, y : number, z : number, skipWhitespace : boolean = false, blockName : string ) {
     // x, y, z is top left corner of image. 
     // It builds in a positive direction on the x axis and negative on the y axis. follows given z axis. 
     // TODO: Make a copy of this that moves along the x axis instead. 
@@ -72,24 +68,25 @@ export async function drawVerticle (socket:any, pixelArray : WoolColors[][], x :
     for(let i = 0; i<pixelArray.length; i++){
         for(let j = 0; j<pixelArray[i].length; j++){
             let skip = skipWhitespace;
-            if ( skip && pixelArray[i][j] == WoolColors.white) {
+            if ( skip && pixelArray[i][j].colorId == ColorIds.white) {
                 continue;
             }   else {
-                    socket.send(setWool(
+                    socket.send(setBlock(
                                     x + j, 
                                     y - i, 
                                     z, 
-                                    pixelArray[i][j]));
+                                    pixelArray[i][j].name,
+                                    pixelArray[i][j].colorId));
                     await timer(20);
             }
         }
     }    
 }
 
-export async function buildWalls (socket:any, pixelArray : WoolColors[][], x: number, y: number, z:number, height: number, blockName: string, color? : number ) {
+export async function buildWalls (socket:any, pixelArray : ColorIds[][], x: number, y: number, z:number, height: number, blockName: string, color? : number ) {
     for(let i = 0; i<pixelArray.length; i++){
         for(let j = 0; j<pixelArray[i].length; j++){
-            if (pixelArray[i][j] == WoolColors.white) {
+            if (pixelArray[i][j] == ColorIds.white) {
                 continue;
             }   else {
                     socket.send(setPillar(

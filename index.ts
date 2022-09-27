@@ -1,13 +1,20 @@
 import ws from 'ws';
 
 import {buildWalls, drawHorizontal, drawVerticle } from './actions';
-import { WoolColors } from './colors/wool/woolColors';
+import { Block } from './blocks/IBlock';
+import { ColorIds } from './colors/Colors';
 import parseImage from './parseImage';
 
 const timer = (ms:number) => new Promise(res => setTimeout(res, ms));
 
-let colorArray : WoolColors[][] = [];
-let greyscaleArray : WoolColors[][] = []; 
+let colorArray : Block[][] = [];
+let greyscaleArray : ColorIds[][] = []; 
+let palette = 'all'
+
+
+const palettes = [
+    'all', 'wool', 'concrete', 'terracotta'
+]
 
 function isImageLoaded () : boolean {
     if(colorArray.length < 1) {
@@ -16,10 +23,17 @@ function isImageLoaded () : boolean {
     return true;
 }
 
-async function loadImage (socket : any, imageName : string ) : Promise<void> {
+function setPalette ( blockname : string ) : void {
+    if (palettes.includes(blockname)){
+        palette = blockname
+    }
+    else console.log('palette not set with blockname: ', + blockname);
+}
 
-    colorArray = parseImage(imageName + ".png", true);
-    greyscaleArray = parseImage(imageName + ".png", false);
+async function loadImage (socket : any, imageName : string, palette : string ) : Promise<void> {
+
+    colorArray = parseImage(imageName + ".png", true, palette);
+    //greyscaleArray = parseImage(imageName + ".png", false);
 
     await timer(30);
     if(colorArray.length < 1) {
@@ -69,7 +83,6 @@ const wss = new ws.Server({
 
 
 function messageToDrawCommand ( socket: any, message : string[] )  {
-    console.log(message);
     let x = Number(message[2]);
     let y = Number(message[3]);
     let z = Number(message[4]);
@@ -77,26 +90,27 @@ function messageToDrawCommand ( socket: any, message : string[] )  {
     let ignoreWhitespace = message[6] === "true" ? true : false; 
     if(message[1] === "h") {
         drawHorizontal(socket, 
-                        isColor ? colorArray : greyscaleArray, 
+                        isColor ? colorArray : colorArray, 
                         x, 
                         y, 
                         z, 
-                        ignoreWhitespace);
+                        ignoreWhitespace
+                        );
     }
 
     else if ( message[1] === "v") {
-        drawVerticle(socket, isColor ? colorArray : greyscaleArray, x, y, z, ignoreWhitespace);
+        drawVerticle(socket, isColor ? colorArray : colorArray, x, y, z, ignoreWhitespace, palette);
     }
 }
 
-function messageToBuildCommand ( socket : any, message : string[] ) {
-    let x = Number(message[1]);
-    let y = Number(message[2]);
-    let z = Number(message[3]);
-    let height = Number(message[4]);
-    let blockName = message[5];
-    buildWalls(socket, colorArray, x, y, z, height, blockName); 
-}
+// function messageToBuildCommand ( socket : any, message : string[] ) {
+//     let x = Number(message[1]);
+//     let y = Number(message[2]);
+//     let z = Number(message[3]);
+//     let height = Number(message[4]);
+//     let blockName = message[5];
+//     buildWalls(socket, colorArray, x, y, z, height, blockName); 
+// }
 
 wss.on('connection', (socket) => {
     console.log('Connected');
@@ -119,16 +133,20 @@ wss.on('connection', (socket) => {
                 
             }
 
-            else if ( message[0] === "!build"){
-                if(isImageLoaded() === true) {
-                    messageToBuildCommand(socket, message);
-                } else socket.send(response("No image loaded."));
+            // else if ( message[0] === "!build"){
+            //     if(isImageLoaded() === true) {
+            //         messageToBuildCommand(socket, message);
+            //     } else socket.send(response("No image loaded."));
                 
-            }
+            // }
 
             else if ( message[0] === "!load"){
                 //
-                loadImage(socket, message[1]);
+                loadImage(socket, message[1], palette);
+            }
+
+            else if ( message[0] === "!setpalette"){
+                setPalette(message[1]); 
             }
         } 
     })
